@@ -73,7 +73,6 @@ class MemberServiceV3_2Test {
         Member findMemberA = memberRepository.findById(memberA.getMemberId());
         Member findMemberEx = memberRepository.findById(memberEx.getMemberId());
 
-        //memberA의 돈만 2000원 줄었고, ex의 돈은 10000원 그대로이다.
         Assertions.assertThat(findMemberA.getMoney()).isEqualTo(10000);
         Assertions.assertThat(findMemberEx.getMoney()).isEqualTo(10000);
     }
