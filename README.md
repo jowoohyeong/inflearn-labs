@@ -12,5 +12,8 @@ springmvc2 / 스프링 MVC 2편 - 백엔드 웹 개발 활용 기술 (김영한 
 - typeconverter / 스프링 타입 컨버터
 - upload / 파일 업로드
 
-springdb1 / 스프링 DB 1편 - 데이터 접근 핵심 원리
+springdb1 / 스프링 DB 1편 - 데이터 접근 핵심 원리 강의 ( 김영한 강사님 )
 - jdbc
+
+springdb2 / 스프링 DB 2편 - 데이터 접근 활용 기술 강의 ( 김영한 강사님 )
+- itemservice-db
