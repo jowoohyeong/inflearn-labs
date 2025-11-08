@@ -16,4 +16,5 @@ springdb1 / 스프링 DB 1편 - 데이터 접근 핵심 원리 강의 ( 김영�
 - jdbc
 
 springdb2 / 스프링 DB 2편 - 데이터 접근 활용 기술 강의 ( 김영한 강사님 )
-- itemservice-db
+- itemservice-db / 데이터 접근 기술
+- springtx / 스프링 트랜잭션
