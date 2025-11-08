@@ -28,6 +28,8 @@ public class V2Config {
     public ItemQueryRepositoryV2 itemQueryRepositoryV2() {
         return new ItemQueryRepositoryV2(em);
     }
+
+    //테스트 데이터 입력용
     @Bean
     public ItemRepository itemRepository() {
         return new JpaItemRepositoryV3(em);
