@@ -39,7 +39,7 @@ public class HelloTraceV2 {
         long resultTimeMs = stopTimeMs - status.getStartTimeMs();
         TraceId traceId = status.getTraceId();
         if (e == null) {
-            log.info("["+traceId.getId()+"] "+ addSpace(START_PREFIX, traceId.getLevel()) +
+            log.info("["+traceId.getId()+"] "+ addSpace(COMPLETE_PREFIX, traceId.getLevel()) +
                     status.getMessage() + ", time=" + resultTimeMs + ", ms");
         } else {
             log.info("[" + traceId.getId() + "] " + addSpace(EX_PREFIX, traceId.getLevel()) +
