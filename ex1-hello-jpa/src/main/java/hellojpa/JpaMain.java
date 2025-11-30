@@ -17,31 +17,58 @@ public class  JpaMain {
         tx.begin();
         //code
         try {
-            Child child1 = new Child();
-            Child child2 = new Child();
+            Address address = new Address("city", "street", "69.180");
+            Member member = new Member();
+            member.setUsername("choco");
+            member.setHomeAddress(address);
 
-            Parent parent = new Parent();
-            parent.addChild(child1);
-            parent.addChild(child2);
+            member.getFavoriteFoods().add("치킨");
+            member.getFavoriteFoods().add("피자");
+            member.getFavoriteFoods().add("족발");
 
-            em.persist(parent);
+            member.getAddressHistory().add(new AddressEntity("city1", "stre1et", "21369.180"));
+            member.getAddressHistory().add(new AddressEntity("city2", "stree2t", "nc9.180"));
 
-            em.flush();
-            em.clear();
-
-            Parent findParent = em.find(Parent.class, parent.getId());
-            findParent.getChildList().remove(0);
-
-
+            em.persist(member);
+//            em.flush();
+//            em.clear();
+            tx.commit();
         } catch (Exception e) {
+            tx.rollback();
             e.printStackTrace();
+        } finally {
+            em.close();
         }
-
-
-        tx.commit();
-
-        em.close();
         emf.close();
+    }
+
+    private static void codeV5(EntityManager em) {
+        Address address = new Address("city", "street", "69.180");
+        Member member = new Member();
+        member.setUsername("choco");
+        member.setHomeAddress(address);
+
+        em.persist(member);
+
+        Address newAddress = new Address("newCity", "street", "69.180");
+        member.setHomeAddress(newAddress);
+    }
+
+    private static void codeV4(EntityManager em) {
+        Child child1 = new Child();
+        Child child2 = new Child();
+
+        Parent parent = new Parent();
+        parent.addChild(child1);
+        parent.addChild(child2);
+
+        em.persist(parent);
+
+        em.flush();
+        em.clear();
+
+        Parent findParent = em.find(Parent.class, parent.getId());
+        findParent.getChildList().remove(0);
     }
 
     private static void codeV3(EntityManager em, EntityManagerFactory emf) {
