@@ -1,6 +1,7 @@
 package hellojpa;
 
 import jakarta.persistence.*;
+import org.hibernate.Hibernate;
 
 import java.util.List;
 
@@ -16,19 +17,21 @@ public class  JpaMain {
         tx.begin();
         //code
         try {
-            Movie movie = new Movie();
-            movie.setDirector("봉준호");
-            movie.setActor("배우");
-            movie.setName("이름");
-            movie.setPrice(10000);
+            Child child1 = new Child();
+            Child child2 = new Child();
 
-            em.persist(movie);
+            Parent parent = new Parent();
+            parent.addChild(child1);
+            parent.addChild(child2);
+
+            em.persist(parent);
 
             em.flush();
             em.clear();
 
-            Member findMovie = em.find(Member.class, movie.getId());
-            System.out.println("findMovie = " + findMovie);
+            Parent findParent = em.find(Parent.class, parent.getId());
+            findParent.getChildList().remove(0);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -39,6 +42,37 @@ public class  JpaMain {
 
         em.close();
         emf.close();
+    }
+
+    private static void codeV3(EntityManager em, EntityManagerFactory emf) {
+        Member member = new Member();
+        member.setUsername("jwh");
+        em.persist(member);
+        em.flush();
+        em.clear();
+
+        Member refMember = em.getReference(Member.class, member.getId());
+        System.out.println("refMember.getClass() = " + refMember.getClass());
+        System.out.println("isLoad = " + emf.getPersistenceUnitUtil().isLoaded(refMember));
+        refMember.getUsername();    //강제 초기화
+        Hibernate.initialize(refMember); // 프록시 강제 초기화 ( 데이터 가져오기 )
+        System.out.println("isLoad = " + emf.getPersistenceUnitUtil().isLoaded(refMember));
+    }
+
+    private static void codeV2(EntityManager em) {
+        Movie movie = new Movie();
+        movie.setDirector("봉준호");
+        movie.setActor("배우");
+        movie.setName("이름");
+        movie.setPrice(10000);
+
+        em.persist(movie);
+
+        em.flush();
+        em.clear();
+
+        Member findMovie = em.find(Member.class, movie.getId());
+        System.out.println("findMovie = " + findMovie);
     }
 
     private static void codeV1(EntityManager em) {
