@@ -1,6 +1,9 @@
 package hellojpa;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.Hibernate;
 
 import java.util.List;
@@ -17,19 +20,8 @@ public class  JpaMain {
         tx.begin();
         //code
         try {
-            Address address = new Address("city", "street", "69.180");
-            Member member = new Member();
-            member.setUsername("choco");
-            member.setHomeAddress(address);
-
-            member.getFavoriteFoods().add("치킨");
-            member.getFavoriteFoods().add("피자");
-            member.getFavoriteFoods().add("족발");
-
-            member.getAddressHistory().add(new AddressEntity("city1", "stre1et", "21369.180"));
-            member.getAddressHistory().add(new AddressEntity("city2", "stree2t", "nc9.180"));
-
-            em.persist(member);
+//            String sql = "SELECT MEMBER_ID, city FROM MEMBER /*WHERE city = 'kim'*/";
+//            List<Member> resultList = em.createNativeQuery(sql, Member.class).getResultList();
 //            em.flush();
 //            em.clear();
             tx.commit();
@@ -40,6 +32,41 @@ public class  JpaMain {
             em.close();
         }
         emf.close();
+    }
+
+    private static void criteriaEx(EntityManager em) {
+        //Criteria 사용 준비
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Member> query = cb.createQuery(Member.class);
+
+        //루트 클래스 (조회를 시작할 클래스)
+        Root<Member> m = query.from(Member.class);
+
+        //쿼리 생성
+        CriteriaQuery<Member> cq = query.select(m).where(cb.equal(m.get("username"), "kim" ));
+        List<Member> resultList = em.createQuery(cq).getResultList();
+    }
+
+    private static void jplV1(EntityManager em) {
+        List resultList = em.createQuery(
+                "select  m from Member m where m.username like '%kim%'", Member.class)
+                .getResultList();
+    }
+
+    private static void codeV6(EntityManager em) {
+        Address address = new Address("city", "street", "69.180");
+        Member member = new Member();
+        member.setUsername("choco");
+        member.setHomeAddress(address);
+
+        member.getFavoriteFoods().add("치킨");
+        member.getFavoriteFoods().add("피자");
+        member.getFavoriteFoods().add("족발");
+
+        member.getAddressHistory().add(new AddressEntity("city1", "stre1et", "21369.180"));
+        member.getAddressHistory().add(new AddressEntity("city2", "stree2t", "nc9.180"));
+
+        em.persist(member);
     }
 
     private static void codeV5(EntityManager em) {

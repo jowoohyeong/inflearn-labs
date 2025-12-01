@@ -21,4 +21,8 @@ public class AddressEntity {
     public AddressEntity(Address address) {
         this.address = address;
     }
+
+    public AddressEntity() {
+
+    }
 }
