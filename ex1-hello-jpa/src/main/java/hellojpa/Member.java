@@ -10,6 +10,9 @@ import java.util.Set;
 
 @Entity
 @Getter
+@NamedQuery(
+    name = "Member.findByUsername",
+    query="select m from Member m where m.username = :username")
 public class Member/* extends BasicEntity*/{
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "MEMBER_ID")
@@ -78,5 +81,12 @@ public class Member/* extends BasicEntity*/{
         team.getMembers().add(this);
     }
 
-
+    @Override
+    public String toString() {
+        return "Member{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", age=" + age +
+                '}';
+    }
 }
