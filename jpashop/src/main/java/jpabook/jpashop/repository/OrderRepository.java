@@ -72,7 +72,7 @@ public class OrderRepository {
 
 
     public List<Order> findAllWithTeam() {
-        String jpql = "select o from Order o " +
+        String jpql = "select distinct o from Order o " +
                                 " join fetch o.member m " +
                                 " join fetch o.delivery d " +
                                 " join fetch o.orderItems oi" +
