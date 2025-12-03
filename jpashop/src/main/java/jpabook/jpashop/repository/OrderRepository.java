@@ -58,4 +58,14 @@ public class OrderRepository {
         }
         return query.getResultList();
     }
+
+    public List<Order> findAllWithMemberDelivery() {
+        String jpql = "select o from Order o " +
+                                " join fetch o.member m " +
+                                " join fetch o.delivery d ";
+        return em.createQuery(jpql, Order.class)
+                .getResultList();
+    }
+
+
 }
