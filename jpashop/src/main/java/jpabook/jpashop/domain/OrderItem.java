@@ -49,4 +49,14 @@ public class OrderItem {
     public int getTotalPrice() {
         return getOrderPrice() * getCount();
     }
+
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+                "id=" + id +
+                ", item=" + item +
+                ", orderPrice=" + orderPrice +
+                ", count=" + count +
+                '}';
+    }
 }
