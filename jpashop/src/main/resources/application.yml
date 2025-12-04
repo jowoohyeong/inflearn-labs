@@ -13,10 +13,12 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
+        default_batch_fetch_size: 100 #100~1000 권장
 #        show_sql: true #System.out에 sql를 남김
         format_sql: true #logger에 sql를 남김
+        org.hibernate.orm.jdbc.bind: trace # 바인딩된 실제 값 출력 (Hibernate 6)
 
 logging.level:
   org.hibernate.SQL: debug
-  org.hibernate.orm.jdbc.bind: trace #스프링 부트 3.x, hibernate6
+#  org.hibernate.orm.jdbc.bind: trace #스프링 부트 3.x, hibernate6
 # org.hibernate.type: trace #스프링 부트 2.x, hibernate5

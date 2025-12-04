@@ -25,10 +25,7 @@ public class OrderRepository {
 
     public List<Order> findAllByString(OrderSearch orderSearch) {
         //language=JPAQL
-        String jpql = "select o from Order o" +
-                                " join fetch o.member m " +
-                                " join fetch o.orderItems oi " +
-                                " join fetch oi.item i ";
+        String jpql = "select o From Order o join o.member m";
         boolean isFirstCondition = true;
 
         //주문 상태 검색
@@ -79,5 +76,15 @@ public class OrderRepository {
                                 " join fetch oi.item i";
 
         return em.createQuery(jpql, Order.class).getResultList();
+    }
+
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+        return em.createQuery(
+                        "select o from Order o " +
+                                " join fetch o.member " +
+                                " join fetch o.delivery d", Order.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
     }
 }
