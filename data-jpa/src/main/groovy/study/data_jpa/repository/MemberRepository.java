@@ -11,11 +11,15 @@ import study.data_jpa.entity.Member;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
 
     List<Member> findTop3HelloBy();
+
+    //    @Query(name = "Member.findByUsername")
+    List<Member> findByUsername(@Param("username") String username);
 
     @Query("select m from Member m where m.username= :username and m.age = :age")
     List<Member> findUser(@Param("username") String username, @Param("age") int age);
@@ -30,6 +34,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findMembers(@Param("names") String username);
     @Query("select m from Member m where m.username in :names")
     List<Member> findByNames(@Param("names") Collection<String> names);
+
+    List<Member> findListByUsername(@Param("username") String username);// 컬렉션
+    Member findMemberByUsername(@Param("username") String username);// 단건
+    Optional<Member> findOptionalByUsername(@Param("username") String username);// 단건, Optional
+
 
     @Query(value = "select m from Member m left join fetch m.team t")
     Page<Member> findByAge(int age, Pageable pageable);
@@ -58,7 +67,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @EntityGraph(attributePaths = {"team"})
     @Lock(LockModeType.PESSIMISTIC_WRITE)
 //    @Query(name = "Member.findByUsername")
-    List<Member> findByUsername(@Param("username") String username);
+//    List<Member> findByUsername(@Param("username") String username);
 
     @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
     Member findReadOnlyByUsername(String username);

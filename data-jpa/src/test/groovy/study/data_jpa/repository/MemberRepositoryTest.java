@@ -18,6 +18,7 @@ import study.data_jpa.entity.Team;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -141,6 +142,19 @@ public class MemberRepositoryTest {
         for (Member byName : byNames) {
             System.out.println("byName = " + byName);
         }
+    }
+
+    @Test
+    void returnType() {
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+//        List<Member> result = memberRepository.findListByUsername("AAA"); // 없으면 빈 List 반환
+//        Member result = memberRepository.findMemberByUsername("AAA");     // 없으면 null 반환
+        Optional<Member> result = memberRepository.findOptionalByUsername("AAA");
+        System.out.println("result = " + result);
     }
 
     //페이징 조건과 정렬 조건 설정
