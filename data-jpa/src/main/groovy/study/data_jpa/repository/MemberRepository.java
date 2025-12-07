@@ -1,6 +1,10 @@
 package study.data_jpa.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import study.data_jpa.dto.MemberDto;
@@ -27,6 +31,17 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select m from Member m where m.username=:useranme")
     List<Member> findMembers(@Param("names") String username);
-    @Query("select m from Member m where m.username in :useranme")
-    List<Member> findNames(@Param("names") List<String> names);
+    @Query("select m from Member m where m.username in :names")
+    List<Member> findByNames(@Param("names") List<String> names);
+
+    @Query(value = "select m from Member m left join fetch m.team t")
+    Page<Member> findByAge(int age, Pageable pageable);
+
+    @Query(value = "select m from Member m",
+    countQuery = "select count(m.username) from Member m")
+    Page<Member> findMemberByAllCountBy(Pageable pageable);
+
+    @Modifying
+    @Query(value = "update Member m set m.age = m.age + 1 where m.age >= :age")
+    int bulkAgePlus(@Param("age") int age);
 }
