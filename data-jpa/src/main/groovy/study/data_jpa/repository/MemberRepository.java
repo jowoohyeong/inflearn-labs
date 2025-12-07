@@ -48,7 +48,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /**
      * 스프링 데이터 JPA 페이징과 정렬
      */
-    @Query(value = "select m from Member m left join fetch m.team t")
+    @Query(value = "select m from Member m")
     Page<Member> findByAge(int age, Pageable pageable);
     @Query(value = "select m from Member m left join m.team t",
     countQuery = "select count(m.username) from Member m")
@@ -60,23 +60,25 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query(value = "update Member m set m.age = m.age + 1 where m.age >= :age")
     int bulkAgePlus(@Param("age") int age);
 
+    /**
+     * @EntityGraph
+     */
+    @Query(value = "select m from Member m left join fetch m.team t")
+    List<Member> findMemberFetchJoin();
     // 공통 메서드 오버라이드
     @Override
     @EntityGraph(attributePaths = {"team"})
     List<Member> findAll();
-
-
     //JPQL + 엔티티 그래프
-//    @EntityGraph(attributePaths = {"team"})
-//    @Query("select m from Member m")
-//    @EntityGraph("Member.all")
-//    List<Member> findMemberEntityGraph();
+    @EntityGraph(attributePaths = {"team"})
+    @Query("select m from Member m")
+    List<Member> findMemberEntityGraph();
 
     // 메서드 이름으로 쿼리에서 특히 편리
-    @EntityGraph(attributePaths = {"team"})
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-//    @Query(name = "Member.findByUsername")
-//    List<Member> findByUsername(@Param("username") String username);
+//    @EntityGraph(attributePaths = {"team"})
+    @Query(name = "Member.findByUsername")  // Member 클래스에 @NamedEntityGraph 선언했으면 @EntityGraph 제거하고 사용
+    //    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Member> findEntityGraphByUsername(@Param("username") String username);
 
     @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
     Member findReadOnlyByUsername(String username);
