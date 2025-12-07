@@ -20,30 +20,37 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     //    @Query(name = "Member.findByUsername")
     List<Member> findByUsername(@Param("username") String username);
-
+    /**
+     * @Query, 리포지토리 메소드에 쿼리 정의하기
+     */
     @Query("select m from Member m where m.username= :username and m.age = :age")
     List<Member> findUser(@Param("username") String username, @Param("age") int age);
-
     @Query("select m.username from Member m")
     List<String> findUsernameList();
-
+    /**
+     * @Query, 값, DTO 조회하기
+      */
     @Query("select new study.data_jpa.dto.MemberDto(m.id, m.username, t.name) from Member m join m.team t")
     List<MemberDto> findMemberDto();
-
+    /**
+     * 파라미터 바인딩
+     */
     @Query("select m from Member m where m.username=:useranme")
     List<Member> findMembers(@Param("names") String username);
     @Query("select m from Member m where m.username in :names")
     List<Member> findByNames(@Param("names") Collection<String> names);
-
+    /**
+     * 반환 타입
+      */
     List<Member> findListByUsername(@Param("username") String username);// 컬렉션
     Member findMemberByUsername(@Param("username") String username);// 단건
     Optional<Member> findOptionalByUsername(@Param("username") String username);// 단건, Optional
-
-
+    /**
+     * 스프링 데이터 JPA 페이징과 정렬
+     */
     @Query(value = "select m from Member m left join fetch m.team t")
     Page<Member> findByAge(int age, Pageable pageable);
-
-    @Query(value = "select m from Member m",
+    @Query(value = "select m from Member m left join m.team t",
     countQuery = "select count(m.username) from Member m")
     Page<Member> findMemberByAllCountBy(Pageable pageable);
 

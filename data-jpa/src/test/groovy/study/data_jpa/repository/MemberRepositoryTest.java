@@ -170,13 +170,14 @@ public class MemberRepositoryTest {
         //when
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
         Page<Member> page = memberRepository.findByAge(10, pageRequest);
+        Page<MemberDto> toMap = page.map(member -> new MemberDto(member.getId(), member.getUsername(), null));
 
         //then
-        List<Member> content = page.getContent(); //조회된 데이터
-        assertThat(content.size()).isEqualTo(3); //조회된 데이터 수
+        List<Member> content = page.getContent();           //조회된 데이터
+        assertThat(content.size()).isEqualTo(3);   //조회된 데이터 수
         assertThat(page.getTotalElements()).isEqualTo(5); //전체 데이터 수
-        assertThat(page.getNumber()).isEqualTo(0); //페이지 번호
-        assertThat(page.getTotalPages()).isEqualTo(2); //전체 페이지 번호
+        assertThat(page.getNumber()).isEqualTo(0);      //페이지 번호
+        assertThat(page.getTotalPages()).isEqualTo(2);  //전체 페이지 번호
         assertThat(page.isFirst()).isTrue(); //첫번째 항목인가?
         assertThat(page.hasNext()).isTrue(); //다음 페이지가 있는가?
     }
