@@ -53,8 +53,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query(value = "select m from Member m left join m.team t",
     countQuery = "select count(m.username) from Member m")
     Page<Member> findMemberByAllCountBy(Pageable pageable);
-
-    @Modifying
+    /**
+     * 벌크성 수정 쿼리
+     */
+    @Modifying(clearAutomatically = true)
     @Query(value = "update Member m set m.age = m.age + 1 where m.age >= :age")
     int bulkAgePlus(@Param("age") int age);
 

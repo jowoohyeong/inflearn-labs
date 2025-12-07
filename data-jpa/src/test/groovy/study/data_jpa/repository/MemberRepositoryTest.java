@@ -183,21 +183,6 @@ public class MemberRepositoryTest {
     }
 
     @Test
-    void examTest() {
-        memberRepository.save(new Member("member1", 10));
-        memberRepository.save(new Member("member2", 10));
-        memberRepository.save(new Member("member3", 10));
-        memberRepository.save(new Member("member4", 10));
-        memberRepository.save(new Member("member5", 10));
-
-        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
-        Slice<Member> members = memberRepository.findMemberByAllCountBy(pageRequest);
-        for (Member member : members) {
-            System.out.println("member = " + member);
-        }
-    }
-
-    @Test
     public void bulkUpdate() throws Exception {
         //given
         memberRepository.save(new Member("member1", 10));
@@ -209,6 +194,9 @@ public class MemberRepositoryTest {
         //when
         int resultCount = memberRepository.bulkAgePlus(20);
 
+        List<Member> member5 = memberRepository.findByUsername("member5");
+        Member member = member5.get(0);
+        System.out.println("member = " + member);
         //then
         assertThat(resultCount).isEqualTo(3);
     }
