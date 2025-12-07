@@ -236,7 +236,27 @@ public class MemberRepositoryTest {
         member.setUsername("member2");
 
         em.flush();
+        em.clear();
+
+        List<Member> all = memberRepository.findAll();
+        for (Member member1 : all) {
+            System.out.println("member1 = " + member1);
+        }
     }
+    @Test
+    void lock() {
+        memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        List<Member> member = memberRepository.findLockByUsername("member1");
+
+        for (Member member1 : member) {
+            System.out.println("member1 = " + member1);
+        }
+    }
+
+
 
 
 }

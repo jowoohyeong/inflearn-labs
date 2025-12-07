@@ -15,9 +15,7 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
-
     List<Member> findTop3HelloBy();
-
     //    @Query(name = "Member.findByUsername")
     List<Member> findByUsername(@Param("username") String username);
     /**
@@ -59,7 +57,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Modifying(clearAutomatically = true)
     @Query(value = "update Member m set m.age = m.age + 1 where m.age >= :age")
     int bulkAgePlus(@Param("age") int age);
-
     /**
      * @EntityGraph
      */
@@ -69,21 +66,20 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Override
     @EntityGraph(attributePaths = {"team"})
     List<Member> findAll();
-    //JPQL + 엔티티 그래프
+    // JPQL + 엔티티 그래프
     @EntityGraph(attributePaths = {"team"})
     @Query("select m from Member m")
     List<Member> findMemberEntityGraph();
-
     // 메서드 이름으로 쿼리에서 특히 편리
 //    @EntityGraph(attributePaths = {"team"})
     @Query(name = "Member.findByUsername")  // Member 클래스에 @NamedEntityGraph 선언했으면 @EntityGraph 제거하고 사용
-    //    @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Member> findEntityGraphByUsername(@Param("username") String username);
-
+    /**
+     * JPA Hint & Lock
+     */
     @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
     Member findReadOnlyByUsername(String username);
-
-    @QueryHints(value = {@QueryHint(name = "org.hibernate.readOnly", value = "true")}, forCounting = true)
-    Page<Member> findByUsername(String name, Pageable pageable);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Member> findLockByUsername(String name);
 
 }
