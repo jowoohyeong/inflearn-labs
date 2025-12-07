@@ -256,7 +256,10 @@ public class MemberRepositoryTest {
         }
     }
 
-
+    @Test
+    void callCustom() {
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+    }
 
 
 }
