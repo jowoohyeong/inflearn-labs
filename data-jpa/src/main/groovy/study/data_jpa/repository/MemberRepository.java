@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import study.data_jpa.dto.MemberDto;
 import study.data_jpa.entity.Member;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -28,7 +29,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m from Member m where m.username=:useranme")
     List<Member> findMembers(@Param("names") String username);
     @Query("select m from Member m where m.username in :names")
-    List<Member> findByNames(@Param("names") List<String> names);
+    List<Member> findByNames(@Param("names") Collection<String> names);
 
     @Query(value = "select m from Member m left join fetch m.team t")
     Page<Member> findByAge(int age, Pageable pageable);
@@ -50,8 +51,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     //JPQL + 엔티티 그래프
 //    @EntityGraph(attributePaths = {"team"})
 //    @Query("select m from Member m")
-    @EntityGraph("Member.all")
-    List<Member> findMemberEntityGraph();
+//    @EntityGraph("Member.all")
+//    List<Member> findMemberEntityGraph();
 
     // 메서드 이름으로 쿼리에서 특히 편리
     @EntityGraph(attributePaths = {"team"})
