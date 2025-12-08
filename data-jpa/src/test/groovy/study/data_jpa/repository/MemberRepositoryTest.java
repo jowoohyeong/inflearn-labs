@@ -284,6 +284,4 @@ public class MemberRepositoryTest {
         //then
         assertThat(result.size()).isEqualTo(1);
     }
-
-
 }
