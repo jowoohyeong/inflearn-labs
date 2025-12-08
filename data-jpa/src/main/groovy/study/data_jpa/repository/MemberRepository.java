@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom{
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom, JpaSpecificationExecutor{
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
     List<Member> findTop3HelloBy();
     //    @Query(name = "Member.findByUsername")
@@ -81,5 +81,9 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     Member findReadOnlyByUsername(String username);
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Member> findLockByUsername(String name);
-
+    /**
+     * 네이티브 쿼리
+     * */
+    @Query(value = "select * from member where username = ?", nativeQuery = true)
+    Member findByNativeQuery(String name);
 }
