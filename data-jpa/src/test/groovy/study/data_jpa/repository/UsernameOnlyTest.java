@@ -29,6 +29,7 @@ class UsernameOnlyTest {
         em.persist(new Member("m1", 0, teamA));
         em.persist(new Member("m2", 0, teamA));
         em.flush();
+        em.clear();
 
         //when
         List<UsernameOnly> result = memberRepository.findProjectionsByUsername("m1");
@@ -44,7 +45,5 @@ class UsernameOnlyTest {
             System.out.println("nestedClosedProjection.username = " + nestedClosedProjection.getUsername());
             System.out.println("nestedClosedProjection.team.name = " + nestedClosedProjection.getTeam().getName());
         }
-
-
     }
 }
