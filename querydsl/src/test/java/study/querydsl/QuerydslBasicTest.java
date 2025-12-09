@@ -420,7 +420,7 @@ public class QuerydslBasicTest {
                 .containsExactly(20,30,40);
     }
     @Test
-    void subQueryTest() {
+    void selectSubQuery() {
         QMember memberSub = new QMember("memberSub");
         List<Tuple> fetch = queryFactory
                 .select(member.username,
