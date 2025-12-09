@@ -17,6 +17,7 @@ spring:
 #        show_sql: true #System.out에 sql를 남김
         format_sql: true #logger에 sql를 남김
         org.hibernate.orm.jdbc.bind: trace # 바인딩된 실제 값 출력 (Hibernate 6)
+#    open-in-view: false
 
 logging.level:
   org.hibernate.SQL: debug
