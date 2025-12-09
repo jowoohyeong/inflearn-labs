@@ -448,6 +448,9 @@ public class QuerydslBasicTest {
         for (String s : result) {
             System.out.println("s = " + s);
         }
+    }
+    @Test
+    void complexCase() {
         System.out.println("==========================================");
         List<Tuple> result2 = queryFactory
                 .select(member.username, member.age, new CaseBuilder()
@@ -460,7 +463,6 @@ public class QuerydslBasicTest {
             System.out.println("s = " + s);
         }
     }
-
     @Test
     void caseTest2() {
         NumberExpression<Integer> rankPath = new CaseBuilder()
@@ -481,7 +483,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    void concat() {
+    void constant() {
         Tuple tuple = queryFactory
                 .select(member.username, Expressions.constant("A"))
                 .from(member)
@@ -489,6 +491,9 @@ public class QuerydslBasicTest {
         System.out.println("tuple = " + tuple);
         System.out.println("tuple.get(member.username) = " + tuple.get(member.username));
         System.out.println("tuple.get(Expressions.constant(\"A\")) = " + tuple.get(Expressions.constant("A")));
+    }
+    @Test
+    void concat() {
 
         String result = queryFactory
                 .select(member.username.concat("_").concat(member.age.stringValue()))
