@@ -136,7 +136,7 @@ class MemberDtoTest {
     }
 
     @Test
-    void queryProjection() {
+    void findDtoByQueryProjection() {
         List<MemberDto> result = queryFactory
                 .select(new QMemberDto(member.username, member.age))
                 .from(member)
