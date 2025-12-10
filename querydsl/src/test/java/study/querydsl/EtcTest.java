@@ -45,13 +45,34 @@ public class EtcTest {
     }
 
     @Test
-    void updateBulk() {
+    void bulkUpdate() {
         long count = queryFactory
                 .update(member)
                 .set(member.username, "비회원")
                 .where(member.age.lt(28))
                 .execute();
-        queryFactory
+
+        em.flush();
+        em.clear();
+
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .fetch();
+
+        for (Member member1 : result) {
+            System.out.println("member1 = " + member1);
+        }
+    }
+    @Test
+    void bulkAdd() {
+        long count = queryFactory
+                .update(member)
+                .set(member.age, member.age.multiply(2))
+                .execute();
+    }
+    @Test
+    void bulkDelete() {
+        long execute = queryFactory
                 .delete(member)
                 .where(member.age.gt(18))
                 .execute();
