@@ -87,10 +87,10 @@ public class EtcTest {
                 .fetchFirst();
         System.out.println("result = " + result);
 
-
         List<String> list = queryFactory
                 .select(member.username)
                 .from(member)
+//                .where(member.username.eq(Expressions.stringTemplate("function('lower', {0})", member.username)))
                 .where(member.username.eq(member.username.lower()))
                 .fetch();
         for (String s : list) {
