@@ -1,7 +1,20 @@
 spring:
   elasticsearch:
     uris: http://localhost:9200
-
+#  datasource:
+#    url: jdbc:h2:tcp://localhost/~/coupang
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
+  datasource:
+    url: jdbc:mysql://localhost:3306/coupang
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 logging:
   level:
     org.elasticsearch.client: TRACE

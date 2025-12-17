@@ -1,4 +1,4 @@
-package com.example.elastic;
+package com.example.elastic.user;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;

@@ -1,4 +1,4 @@
-package com.example.elastic;
+package com.example.elastic.user;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
