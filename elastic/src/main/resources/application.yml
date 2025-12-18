@@ -1,4 +1,8 @@
 spring:
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
   elasticsearch:
     uris: http://localhost:9200
 #  datasource:
@@ -18,3 +22,5 @@ spring:
 logging:
   level:
     org.elasticsearch.client: TRACE
+
+xpack.security.http.ssl.enabled: true

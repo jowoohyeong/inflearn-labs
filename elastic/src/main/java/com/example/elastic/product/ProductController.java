@@ -1,6 +1,7 @@
 package com.example.elastic.product;
 
 import com.example.elastic.product.domain.Product;
+import com.example.elastic.product.domain.ProductDocument;
 import com.example.elastic.product.dto.CreateProductRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,25 @@ public class ProductController {
         Product product = productService.createProduct(createProductRequestDto);
         return ResponseEntity.ok(product);
     }
+    @GetMapping("/suggestions")
+    public ResponseEntity<List<String>> getSuggestions(@RequestParam String query) {
+        List<String> suggestions = productService.getSuggestions(query);
+        return ResponseEntity.ok(suggestions);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductDocument>> searchProducts(
+            @RequestParam String query,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "0")  double minPrice,
+            @RequestParam(defaultValue = "100000000")  double maxPrice,
+            @RequestParam(defaultValue = "1")  int page,
+            @RequestParam(defaultValue = "5")  int size
+    ) {
+        List<ProductDocument> products = productService.searchProducts(query, category, minPrice, maxPrice, page, size);
+        return ResponseEntity.ok(products);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
