@@ -1,9 +1,14 @@
-package com.example.elastic;
+package com.example.elastic.user;
 
-public class UserUpdateRequestDto {
+public class UserCreateRequestDto {
+    private String id;
     private String name;
     private Long age;
     private Boolean isActive;
+
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
