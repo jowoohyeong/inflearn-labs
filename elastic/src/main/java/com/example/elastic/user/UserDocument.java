@@ -55,6 +55,6 @@ public class UserDocument {
     }
 
     public void setIsActive(Boolean isActive) {
-        isActive = isActive;
+        this.isActive = isActive;
     }
 }

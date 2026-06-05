@@ -34,12 +34,16 @@ public class ProductDocument {
     )
     private String category;
 
-    public ProductDocument(String id, String name, String description, int price, double rating, String category) {
+    @Field(type = Text)
+    private String nameJaso;
+
+    public ProductDocument(String id, String name, String description, int price, double rating, String category, String nameJaso) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.rating = rating;
         this.category = category;
+        this.nameJaso = nameJaso;
     }
 }

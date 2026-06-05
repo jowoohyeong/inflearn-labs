@@ -4,9 +4,11 @@ import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import com.example.elastic.product.domain.Product;
 import com.example.elastic.product.domain.ProductDocument;
 import com.example.elastic.product.dto.CreateProductRequestDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.IndexOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.HighlightQuery;
@@ -15,6 +17,8 @@ import org.springframework.data.elasticsearch.core.query.highlight.HighlightFiel
 import org.springframework.data.elasticsearch.core.query.highlight.HighlightParameters;
 import org.springframework.stereotype.Service;
 
+import com.example.elastic.common.utils.HangulKeyConverter;
+import com.example.elastic.common.utils.JasoDecomposer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +54,8 @@ public class ProductService {
                 saveProduct.getDescription(),
                 saveProduct.getPrice(),
                 saveProduct.getRating(),
-                saveProduct.getCategory()
+                saveProduct.getCategory(),
+                JasoDecomposer.decompose(saveProduct.getName())
         );
         productDocumentRepository.save(productDocument);
 
@@ -85,10 +90,47 @@ public class ProductService {
     }
 
     public List<ProductDocument> searchProducts(String query, String category, double minPrice, double maxPrice, int page, int size) {
-        Query multiMatchQuery = MultiMatchQuery.of(m -> m
+        String convertedQuery = HangulKeyConverter.convert(query);
+        String jasoQuery = JasoDecomposer.decompose(query);
+        String convertedJasoQuery = JasoDecomposer.decompose(convertedQuery);
+
+        List<Query> matchQueries = new ArrayList<>();
+
+        // 1. 원본 검색어 매칭 (일반 텍스트 필드)
+        matchQueries.add(MultiMatchQuery.of(m -> m
                 .query(query)
                 .fields("name^3", "description^1", "category^2")
                 .fuzziness("AUTO")
+        )._toQuery());
+
+        // 2. 한영 오타 변환된 검색어 매칭 (일반 텍스트 필드)
+        if (!convertedQuery.equals(query)) {
+            matchQueries.add(MultiMatchQuery.of(m -> m
+                    .query(convertedQuery)
+                    .fields("name^3", "description^1", "category^2")
+                    .fuzziness("AUTO")
+            )._toQuery());
+        }
+
+        // 3. 자소 분해 매칭 (nameJaso 필드)
+        matchQueries.add(MatchQuery.of(m -> m
+                .field("nameJaso")
+                .query(jasoQuery)
+                .fuzziness("AUTO")
+        )._toQuery());
+
+        // 4. 한영 변환 후 자소 분해 매칭 (nameJaso 필드)
+        if (!convertedJasoQuery.equals(jasoQuery)) {
+            matchQueries.add(MatchQuery.of(m -> m
+                    .field("nameJaso")
+                    .query(convertedJasoQuery)
+                    .fuzziness("AUTO")
+            )._toQuery());
+        }
+
+        Query mainMatchQuery = BoolQuery.of(b -> b
+                .should(matchQueries)
+                .minimumShouldMatch("1")
         )._toQuery();
 
         List<Query> filters = new ArrayList<>();
@@ -113,7 +155,7 @@ public class ProductService {
         )._toRangeQuery()._toQuery();
 
         Query boolQuery = BoolQuery.of(b -> b
-                .must(multiMatchQuery)
+                .must(mainMatchQuery)
                 .filter(filters)
                 .should(ratingShould)
         )._toQuery();
@@ -136,10 +178,57 @@ public class ProductService {
         return searchHits.getSearchHits().stream()
                 .map(hit-> {
                     ProductDocument content = hit.getContent();
-                    String hightname = hit.getHighlightField("name").get(0);
-                    content.setName(hightname);
+                    List<String> highlightFields = hit.getHighlightField("name");
+                    if (highlightFields != null && !highlightFields.isEmpty()) {
+                        content.setName(highlightFields.get(0));
+                    }
                     return content;
                     }
                 ).toList();
+    }
+
+    public int reindexProducts(boolean reset, int chunkSize) {
+        if (reset) {
+            IndexOperations indexOps = elasticsearchOperations.indexOps(ProductDocument.class);
+            if (indexOps.exists()) {
+                indexOps.delete();
+            }
+            indexOps.create();
+            indexOps.putMapping(indexOps.createMapping());
+        }
+
+        int totalCount = 0;
+        int page = 0;
+        boolean hasNext = true;
+
+        while (hasNext) {
+            Pageable pageable = PageRequest.of(page, chunkSize);
+            Page<Product> productPage = productRepository.findAll(pageable);
+            List<Product> products = productPage.getContent();
+
+            if (products.isEmpty()) {
+                break;
+            }
+
+            List<ProductDocument> documents = products.stream()
+                    .map(p -> new ProductDocument(
+                            p.getId().toString(),
+                            p.getName(),
+                            p.getDescription(),
+                            p.getPrice(),
+                            p.getRating(),
+                            p.getCategory(),
+                            JasoDecomposer.decompose(p.getName())
+                    ))
+                    .toList();
+
+            productDocumentRepository.saveAll(documents);
+            totalCount += documents.size();
+
+            hasNext = productPage.hasNext();
+            page++;
+        }
+
+        return totalCount;
     }
 }

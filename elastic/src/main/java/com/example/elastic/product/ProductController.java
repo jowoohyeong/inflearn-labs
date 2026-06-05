@@ -48,6 +48,15 @@ public class ProductController {
     }
 
 
+    @PostMapping("/reindex")
+    public ResponseEntity<String> reindexProducts(
+            @RequestParam(defaultValue = "false") boolean reset,
+            @RequestParam(defaultValue = "1000") int chunkSize
+    ) {
+        int count = productService.reindexProducts(reset, chunkSize);
+        return ResponseEntity.ok(count + " 개의 상품이 성공적으로 재색인되었습니다.");
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);

@@ -47,7 +47,7 @@ public class UserController {
         existingUser.setIsActive(userUpdateRequestDto.getIsActive());
         return userDocumentRepository.save(existingUser);
     }
-    @DeleteMapping()
+    @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable String id) {
         UserDocument existingUser = userDocumentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
