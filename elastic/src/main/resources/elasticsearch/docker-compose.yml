@@ -19,3 +19,11 @@ services:
       - 5601:5601 # 5601번 포트에서 kibana 실행
     environment:
       - ELASTICSEARCH_HOSTS=http://elastic:9200 # kibana가 통신할 Elasticsearch 주소 알려주기
+      -
+  mysql:
+    image: mariadb:10.9
+    ports:
+      - 3307:3306       # 외부 충돌을 피하기 위해 내 컴퓨터에서는 3307로 접속!
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=coupang       # 처음에 자동으로 만들 데이터베이스 이름 (선택사항)
