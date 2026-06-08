@@ -41,9 +41,10 @@ public class ProductController {
             @RequestParam(defaultValue = "0")  double minPrice,
             @RequestParam(defaultValue = "100000000")  double maxPrice,
             @RequestParam(defaultValue = "1")  int page,
-            @RequestParam(defaultValue = "5")  int size
+            @RequestParam(defaultValue = "5")  int size,
+            @RequestParam(required = false) String sortBy
     ) {
-        List<ProductDocument> products = productService.searchProducts(query, category, minPrice, maxPrice, page, size);
+        List<ProductDocument> products = productService.searchProducts(query, category, minPrice, maxPrice, page, size, sortBy);
         return ResponseEntity.ok(products);
     }
 

@@ -117,6 +117,22 @@
         </div>
       </div>
 
+      <!-- Results Header -->
+      <div class="results-header">
+        <div class="results-count">
+          검색된 상품: <span id="results-count-num">0</span>개
+        </div>
+        <div class="sort-container" id="sort-container">
+          <label for="sort-by">정렬 기준</label>
+          <select id="sort-by" class="sort-select">
+            <option value="">정확도순 (유사도)</option>
+            <option value="price_asc">가격 낮은 순</option>
+            <option value="price_desc">가격 높은 순</option>
+            <option value="rating_desc">평점 높은 순</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Results Grid -->
       <div id="results-grid" class="results-grid">
         <!-- Results will be dynamically inserted here -->

@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSearch = document.getElementById('btn-search');
   const resultsGrid = document.getElementById('results-grid');
   const toastContainer = document.getElementById('toast-container');
+  const sortBySelect = document.getElementById('sort-by');
+  const sortContainer = document.getElementById('sort-container');
+  const resultsCountNum = document.getElementById('results-count-num');
 
   let debounceTimer;
 
@@ -160,12 +163,17 @@ document.addEventListener('DOMContentLoaded', () => {
       searchInput.placeholder = '전체 조회 모드입니다. 검색어를 무시하고 모든 DB 데이터를 가져옵니다.';
       searchInput.disabled = true;
       suggestionsBox.style.display = 'none';
+      sortContainer.style.display = 'none';
     } else {
       searchInput.placeholder = '검색어를 입력해 보세요 (예: 삼성, 맥북, 가전...)';
       searchInput.disabled = false;
+      sortContainer.style.display = 'flex';
     }
     fetchProducts();
   });
+
+  // Trigger search on sort change
+  sortBySelect.addEventListener('change', fetchProducts);
 
   // Trigger search on click
   btnSearch.addEventListener('click', fetchProducts);
@@ -201,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const category = filterCategory.value.trim();
     const minPrice = filterMinPrice.value || 0;
     const maxPrice = filterMaxPrice.value || 100000000;
+    const sortBy = sortBySelect.value;
 
     resultsGrid.innerHTML = `
       <div class="no-results" style="border:none;">
@@ -214,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (source === 'rdb') {
         url = '/products?page=1&size=100';
       } else {
-        url = `/products/search?query=${encodeURIComponent(query || ' ')}&minPrice=${minPrice}&maxPrice=${maxPrice}&page=1&size=50`;
+        url = `/products/search?query=${encodeURIComponent(query || ' ')}&minPrice=${minPrice}&maxPrice=${maxPrice}&page=1&size=50&sortBy=${sortBy}`;
         if (category) {
           url += `&category=${encodeURIComponent(category)}`;
         }
@@ -224,9 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) throw new Error('조회 요청 중 오류가 발생했습니다.');
       
       const data = await res.json();
+      resultsCountNum.textContent = data.length;
       renderProducts(data, source);
     } catch (err) {
       showToast(err.message, 'error');
+      resultsCountNum.textContent = '0';
       resultsGrid.innerHTML = `
         <div class="no-results">
           <svg width="24" height="24" fill="none" stroke="var(--danger)" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>

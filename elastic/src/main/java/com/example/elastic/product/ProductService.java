@@ -7,6 +7,7 @@ import com.example.elastic.product.dto.CreateProductRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.IndexOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -68,14 +69,48 @@ public class ProductService {
     }
 
     public List<String> getSuggestions(String query) {
-        Query mulitMatchQuery = MultiMatchQuery.of(m -> m.query(query)
+        String convertedQuery = HangulKeyConverter.convert(query);
+        String jasoQuery = JasoDecomposer.decompose(query);
+        String convertedJasoQuery = JasoDecomposer.decompose(convertedQuery);
+
+        List<Query> matchQueries = new ArrayList<>();
+
+        // 1. 원본 검색어 매칭
+        matchQueries.add(MultiMatchQuery.of(m -> m.query(query)
                 .type(TextQueryType.BoolPrefix)
-                .fields("name.auto_complete","name.auto_complete._2gram","name.auto_complete._3gram")
+                .fields("name.auto_complete", "name.auto_complete._2gram", "name.auto_complete._3gram")
+        )._toQuery());
+
+        // 2. 한영 오타 변환된 검색어 매칭
+        if (!convertedQuery.equals(query)) {
+            matchQueries.add(MultiMatchQuery.of(m -> m.query(convertedQuery)
+                    .type(TextQueryType.BoolPrefix)
+                    .fields("name.auto_complete", "name.auto_complete._2gram", "name.auto_complete._3gram")
+            )._toQuery());
+        }
+
+        // 3. 자소 분해 매칭 (nameJaso 필드)
+        matchQueries.add(MatchBoolPrefixQuery.of(m -> m
+                .field("nameJaso")
+                .query(jasoQuery)
+        )._toQuery());
+
+        // 4. 한영 변환 후 자소 분해 매칭 (nameJaso 필드)
+        if (!convertedJasoQuery.equals(jasoQuery)) {
+            matchQueries.add(MatchBoolPrefixQuery.of(m -> m
+                    .field("nameJaso")
+                    .query(convertedJasoQuery)
+            )._toQuery());
+        }
+
+        Query mainMatchQuery = BoolQuery.of(b -> b
+                .should(matchQueries)
+                .minimumShouldMatch("1")
         )._toQuery();
 
         NativeQuery nativeQuery = NativeQuery.builder()
-                .withQuery(mulitMatchQuery)
-                .withPageable(PageRequest.of(0,5))
+                .withQuery(mainMatchQuery)
+                .withPageable(PageRequest.of(0, 5))
                 .build();
 
         SearchHits<ProductDocument> searchHits = this.elasticsearchOperations.search(nativeQuery, ProductDocument.class);
@@ -89,7 +124,7 @@ public class ProductService {
 
     }
 
-    public List<ProductDocument> searchProducts(String query, String category, double minPrice, double maxPrice, int page, int size) {
+    public List<ProductDocument> searchProducts(String query, String category, double minPrice, double maxPrice, int page, int size, String sortBy) {
         String convertedQuery = HangulKeyConverter.convert(query);
         String jasoQuery = JasoDecomposer.decompose(query);
         String convertedJasoQuery = JasoDecomposer.decompose(convertedQuery);
@@ -168,10 +203,19 @@ public class ProductService {
         Highlight highlight = new Highlight(highlightParameters, List.of(new HighlightField("name")));
         HighlightQuery highlightQuery = new HighlightQuery(highlight, ProductDocument.class);
 
+        Sort sort = Sort.unsorted();
+        if ("price_asc".equals(sortBy)) {
+            sort = Sort.by(Sort.Order.asc("price"), Sort.Order.desc("_score"));
+        } else if ("price_desc".equals(sortBy)) {
+            sort = Sort.by(Sort.Order.desc("price"), Sort.Order.desc("_score"));
+        } else if ("rating_desc".equals(sortBy)) {
+            sort = Sort.by(Sort.Order.desc("rating"), Sort.Order.desc("_score"));
+        }
+
         NativeQuery nativeQuery = NativeQuery.builder()
                 .withQuery(boolQuery)
                 .withHighlightQuery(highlightQuery)
-                .withPageable(PageRequest.of(page -1,size))
+                .withPageable(PageRequest.of(page - 1, size, sort))
                 .build();
         SearchHits<ProductDocument> searchHits = this.elasticsearchOperations.search(nativeQuery, ProductDocument.class);
 
